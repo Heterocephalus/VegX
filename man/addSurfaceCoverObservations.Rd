@@ -22,7 +22,8 @@ addSurfaceCoverObservations(target, x, mapping, coverMethod,
   \item{\code{coverMeasurement} - Surface cover values (required).}
 }}
 
-\item{coverMethod}{A method definition for surface cover measurements (an object of class \code{\linkS4class{VegXMethodDefinition}}).}
+\item{coverMethod}{A method definition for surface cover measurements (an object of class \code{\linkS4class{VegXMethodDefinition}}).
+Alternatively, the method can be specified using a string if a predefined method exists (see \code{\link{predefinedMeasurementMethod}}).}
 
 \item{surfaceTypeDefinition}{An object of class \code{\linkS4class{VegXSurfaceTypeDefinition}} indicating the definition of surface types.}
 
@@ -64,8 +65,8 @@ coverMethod = predefinedMeasurementMethod("Surface cover/\%")
 # Define surface types from the data
 unique(mtfyffe_groundcover$PlotGroundCover)
 surfaceTypes = defineSurfaceTypes(name = "Default surface types",
-                                  description = "Five surface categories",
-                                  surfaceNames = c("Vegetation", "Moss", "Litter", "Exposed Soil", "Rock"))
+                  description = "Five surface categories",
+                  surfaceNames = c("Vegetation", "Moss", "Litter", "Exposed Soil", "Rock"))
 
 # Create new Veg-X document with surface cover observations
 x = addSurfaceCoverObservations(newVegX(), mtfyffe_groundcover, mapping,
@@ -81,8 +82,8 @@ head(taki_groundcover)
 
 unique(taki_groundcover$PlotGroundCover)
 surfaceTypes = defineSurfaceTypes(name = "Default surface types",
-                              description = "Five surface categories",
-                              surfaceNames = c("Vegetation", "Soil", "Erosion Pavement", "Litter","Rock"))
+                  description = "Five surface categories",
+                  surfaceNames = c("Vegetation", "Soil", "Erosion Pavement", "Litter","Rock"))
 
 x = addSurfaceCoverObservations(newVegX(), taki_groundcover, mapping,
                                 coverMethod, surfaceTypes)

@@ -61,7 +61,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">VegX</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.6.7</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.6.9</span>
       </span>
     </div>
 
@@ -148,7 +148,8 @@
     </tr>
     <tr>
       <th>methods</th>
-      <td><p>A list measurement methods for <code>heightMeasurement</code> and all the user defined aggregate organism measurements (each method is an object of class <code><a href='VegXMethodDefinition-class.html'>VegXMethodDefinition</a></code>).</p></td>
+      <td><p>A list with measurement methods for <code>heightMeasurement</code> and all the user defined aggregate organism measurements (each method is an object of class <code><a href='VegXMethodDefinition-class.html'>VegXMethodDefinition</a></code>).
+Alternatively, methods can be specified using strings if predefined methods exist (see <code><a href='predefinedMeasurementMethod.html'>predefinedMeasurementMethod</a></code>).</p></td>
     </tr>
     <tr>
       <th>stratumDefinition</th>
@@ -214,27 +215,32 @@ and others that are not taxa. Missing value policy:</p><ul>
 <span class='no'>coverscale</span> <span class='kw'>=</span> <span class='fu'><a href='defineOrdinalScaleMethod.html'>defineOrdinalScaleMethod</a></span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"Recce cover scale"</span>,
                    <span class='kw'>description</span> <span class='kw'>=</span> <span class='st'>"Recce recording method by Hurst/Allen"</span>,
                    <span class='kw'>subject</span> <span class='kw'>=</span> <span class='st'>"plant cover"</span>,
-                   <span class='kw'>citation</span> <span class='kw'>=</span> <span class='st'>"Hurst, JM and Allen, RB. (2007) The Recce method for describing New Zealand vegetation â€“ Field protocols. Landcare Research, Lincoln."</span>,
+                   <span class='kw'>citation</span> <span class='kw'>=</span> <span class='st'>"Hurst, JM and Allen, RB. (2007) 
+                       The Recce method for describing New Zealand vegetation – 
+                       Field protocols. Landcare Research, Lincoln."</span>,
                    <span class='kw'>codes</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"P"</span>,<span class='st'>"1"</span>,<span class='st'>"2"</span>,<span class='st'>"3"</span>, <span class='st'>"4"</span>, <span class='st'>"5"</span>, <span class='st'>"6"</span>),
                    <span class='kw'>quantifiableCodes</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"1"</span>,<span class='st'>"2"</span>,<span class='st'>"3"</span>, <span class='st'>"4"</span>, <span class='st'>"5"</span>, <span class='st'>"6"</span>),
                    <span class='kw'>breaks</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>0</span>, <span class='fl'>1</span>, <span class='fl'>5</span>, <span class='fl'>25</span>, <span class='fl'>50</span>, <span class='fl'>75</span>, <span class='fl'>100</span>),
                    <span class='kw'>midPoints</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>0.05</span>, <span class='fl'>0.5</span>, <span class='fl'>15</span>, <span class='fl'>37.5</span>, <span class='fl'>62.5</span>, <span class='fl'>87.5</span>),
-                   <span class='kw'>definitions</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"Presence"</span>, <span class='st'>"&lt;1%"</span>, <span class='st'>"1-5%"</span>,<span class='st'>"6-25%"</span>, <span class='st'>"26-50%"</span>, <span class='st'>"51-75%"</span>, <span class='st'>"76-100%"</span>))
+                   <span class='kw'>definitions</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"Presence"</span>, <span class='st'>"&lt;1%"</span>, <span class='st'>"1-5%"</span>,<span class='st'>"6-25%"</span>,
+                                   <span class='st'>"26-50%"</span>, <span class='st'>"51-75%"</span>, <span class='st'>"76-100%"</span>))
 
 <span class='co'># Define strata</span>
 <span class='no'>strataDef</span> <span class='kw'>=</span> <span class='fu'><a href='defineMixedStrata.html'>defineMixedStrata</a></span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"Recce strata"</span>,
-                              <span class='kw'>description</span> <span class='kw'>=</span> <span class='st'>"Standard Recce stratum definition"</span>,
-                              <span class='kw'>citation</span> <span class='kw'>=</span> <span class='st'>"Hurst, JM and Allen, RB. (2007) The Recce method for describing New Zealand vegetation â€“ Field protocols. Landcare Research, Lincoln."</span>,
-                              <span class='kw'>heightStrataBreaks</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>0</span>, <span class='fl'>0.3</span>,<span class='fl'>2.0</span>,<span class='fl'>5</span>, <span class='fl'>12</span>, <span class='fl'>25</span>, <span class='fl'>50</span>),
-                              <span class='kw'>heightStrataNames</span> <span class='kw'>=</span> <span class='fu'>paste0</span>(<span class='st'>"Tier "</span>,<span class='fl'>1</span>:<span class='fl'>6</span>),
-                              <span class='kw'>categoryStrataNames</span> <span class='kw'>=</span> <span class='st'>"Tier 7"</span>,
-                              <span class='kw'>categoryStrataDefinition</span> <span class='kw'>=</span> <span class='st'>"Epiphytes"</span>)
+                 <span class='kw'>description</span> <span class='kw'>=</span> <span class='st'>"Standard Recce stratum definition"</span>,
+                 <span class='kw'>citation</span> <span class='kw'>=</span> <span class='st'>"Hurst, JM and Allen, RB. (2007) 
+                   The Recce method for describing New Zealand vegetation – Field protocols. 
+                   Landcare Research, Lincoln."</span>,
+                 <span class='kw'>heightStrataBreaks</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>0</span>, <span class='fl'>0.3</span>,<span class='fl'>2.0</span>,<span class='fl'>5</span>, <span class='fl'>12</span>, <span class='fl'>25</span>, <span class='fl'>50</span>),
+                 <span class='kw'>heightStrataNames</span> <span class='kw'>=</span> <span class='fu'>paste0</span>(<span class='st'>"Tier "</span>,<span class='fl'>1</span>:<span class='fl'>6</span>),
+                 <span class='kw'>categoryStrataNames</span> <span class='kw'>=</span> <span class='st'>"Tier 7"</span>,
+                 <span class='kw'>categoryStrataDefinition</span> <span class='kw'>=</span> <span class='st'>"Epiphytes"</span>)
 
 <span class='co'># Create new Veg-X document with aggregate organism observations</span>
 <span class='no'>x</span> <span class='kw'>=</span> <span class='fu'>addAggregateOrganismObservations</span>(<span class='fu'><a href='newVegX.html'>newVegX</a></span>(), <span class='no'>moki_tcv</span>,
-                        <span class='kw'>mapping</span> <span class='kw'>=</span> <span class='no'>mapping</span>,
-                        <span class='kw'>methods</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='kw'>cover</span><span class='kw'>=</span><span class='no'>coverscale</span>),
-                        <span class='kw'>stratumDefinition</span> <span class='kw'>=</span> <span class='no'>strataDef</span>)</div><div class='output co'>#&gt;  1 additional aggregate organism measurements found: Category.
+                 <span class='kw'>mapping</span> <span class='kw'>=</span> <span class='no'>mapping</span>,
+                 <span class='kw'>methods</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>cover</span><span class='kw'>=</span><span class='no'>coverscale</span>),
+                 <span class='kw'>stratumDefinition</span> <span class='kw'>=</span> <span class='no'>strataDef</span>)</div><div class='output co'>#&gt;  1 additional aggregate organism measurements found: Category.
 #&gt;  Measurement method 'Recce cover scale' added for 'cover'.
 #&gt;  Stratum definition method 'Recce strata' added.
 #&gt;  7 new stratum definitions added.
@@ -264,16 +270,16 @@ and others that are not taxa. Missing value policy:</p><ul>
 <span class='fu'>data</span>(<span class='no'>mtfyffe</span>)
 <span class='no'>mapping</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>plotName</span> <span class='kw'>=</span> <span class='st'>"Plot"</span>, <span class='kw'>subPlotName</span> <span class='kw'>=</span> <span class='st'>"Subplot"</span>, <span class='kw'>obsStartDate</span> <span class='kw'>=</span> <span class='st'>"PlotObsStartDate"</span>,
                <span class='kw'>taxonName</span> <span class='kw'>=</span> <span class='st'>"NVSSpeciesName"</span>, <span class='kw'>stratumName</span> <span class='kw'>=</span> <span class='st'>"Tier"</span>, <span class='kw'>counts</span> <span class='kw'>=</span> <span class='st'>"Value"</span>)
-<span class='no'>countscale</span> <span class='kw'>=</span> <span class='fu'><a href='predefinedMeasurementMethod.html'>predefinedMeasurementMethod</a></span>(<span class='st'>"Plant counts"</span>)
 <span class='no'>strataDef</span> <span class='kw'>=</span> <span class='fu'><a href='defineHeightStrata.html'>defineHeightStrata</a></span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"Standard seedling/sapling strata"</span>,
-                               <span class='kw'>description</span> <span class='kw'>=</span> <span class='st'>"Seedling/sapling stratum definition"</span>,
-                               <span class='kw'>heightBreaks</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>0</span>, <span class='fl'>15</span>, <span class='fl'>45</span>, <span class='fl'>75</span>, <span class='fl'>105</span>, <span class='fl'>135</span>, <span class='fl'>200</span>),
-                               <span class='kw'>strataNames</span> <span class='kw'>=</span> <span class='fu'>as.character</span>(<span class='fl'>1</span>:<span class='fl'>6</span>),
-                               <span class='kw'>strataDefinitions</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"0-15 cm"</span>, <span class='st'>"16-45 cm"</span>, <span class='st'>"46-75 cm"</span>, <span class='st'>"76-105 cm"</span>, <span class='st'>"106-135 cm"</span>, <span class='st'>"&gt; 135 cm"</span>))
+               <span class='kw'>description</span> <span class='kw'>=</span> <span class='st'>"Seedling/sapling stratum definition"</span>,
+               <span class='kw'>heightBreaks</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>0</span>, <span class='fl'>15</span>, <span class='fl'>45</span>, <span class='fl'>75</span>, <span class='fl'>105</span>, <span class='fl'>135</span>, <span class='fl'>200</span>),
+               <span class='kw'>strataNames</span> <span class='kw'>=</span> <span class='fu'>as.character</span>(<span class='fl'>1</span>:<span class='fl'>6</span>),
+               <span class='kw'>strataDefinitions</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"0-15 cm"</span>, <span class='st'>"16-45 cm"</span>, <span class='st'>"46-75 cm"</span>,
+                                     <span class='st'>"76-105 cm"</span>, <span class='st'>"106-135 cm"</span>, <span class='st'>"&gt; 135 cm"</span>))
 <span class='no'>x</span> <span class='kw'>=</span> <span class='fu'>addAggregateOrganismObservations</span>(<span class='fu'><a href='newVegX.html'>newVegX</a></span>(), <span class='no'>mtfyffe_counts</span>, <span class='no'>mapping</span>,
-                                     <span class='kw'>methods</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='kw'>counts</span><span class='kw'>=</span><span class='no'>countscale</span>),
-                                     <span class='kw'>stratumDefinition</span> <span class='kw'>=</span> <span class='no'>strataDef</span>)</div><div class='output co'>#&gt;  1 additional aggregate organism measurements found: Value.
-#&gt;  Measurement method 'Individual counts' added for 'counts'.
+               <span class='kw'>methods</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>counts</span><span class='kw'>=</span><span class='st'>"Individual plant counts"</span>),
+               <span class='kw'>stratumDefinition</span> <span class='kw'>=</span> <span class='no'>strataDef</span>)</div><div class='output co'>#&gt;  1 additional aggregate organism measurements found: Value.
+#&gt;  Measurement method 'Individual plant counts' added for 'counts'.
 #&gt;  Stratum definition method 'Standard seedling/sapling strata' added.
 #&gt;  6 new stratum definitions added.
 #&gt;  131 plot(s) parsed, 131 new added.
@@ -281,27 +287,26 @@ and others that are not taxa. Missing value policy:</p><ul>
 #&gt;  55 organism names(s) parsed, 55 new added.
 #&gt;  55 organism identitie(s) parsed, 55 new added.
 #&gt;  170 stratum observation(s) parsed, 170 new added.
-#&gt;  533 record(s) parsed, 533 new aggregate organism observation(s) added.</div><div class='input'><span class='fu'>head</span>(<span class='fu'><a href='showElementTable.html'>showElementTable</a></span>(<span class='no'>x</span>, <span class='st'>"aggregateOrganismObservation"</span>))</div><div class='output co'>#&gt;   plotName obsStartDate     organismIdentityName      agg_1_method agg_1_value
-#&gt; 1   12 1_E   1980-02-07   Pseudowintera colorata Individual counts           1
-#&gt; 2   12 1_E   1980-02-07          Rubus cissoides Individual counts           1
-#&gt; 3   12 1_M   1980-02-07 Pseudopanax crassifolius Individual counts           1
-#&gt; 4   12 1_P   1980-02-07 Pseudopanax crassifolius Individual counts           1
-#&gt; 5   12 1_P   1980-02-07    Neomyrtus pedunculata Individual counts           1
-#&gt; 6   14 2_J   1980-02-07      Coprosma parviflora Individual counts           4
-#&gt;   stratumName
-#&gt; 1        &lt;NA&gt;
-#&gt; 2        &lt;NA&gt;
-#&gt; 3        &lt;NA&gt;
-#&gt; 4        &lt;NA&gt;
-#&gt; 5        &lt;NA&gt;
-#&gt; 6        &lt;NA&gt;</div><div class='input'>
+#&gt;  533 record(s) parsed, 533 new aggregate organism observation(s) added.</div><div class='input'><span class='fu'>head</span>(<span class='fu'><a href='showElementTable.html'>showElementTable</a></span>(<span class='no'>x</span>, <span class='st'>"aggregateOrganismObservation"</span>))</div><div class='output co'>#&gt;   plotName obsStartDate     organismIdentityName            agg_1_method
+#&gt; 1   12 1_E   1980-02-07   Pseudowintera colorata Individual plant counts
+#&gt; 2   12 1_E   1980-02-07          Rubus cissoides Individual plant counts
+#&gt; 3   12 1_M   1980-02-07 Pseudopanax crassifolius Individual plant counts
+#&gt; 4   12 1_P   1980-02-07 Pseudopanax crassifolius Individual plant counts
+#&gt; 5   12 1_P   1980-02-07    Neomyrtus pedunculata Individual plant counts
+#&gt; 6   14 2_J   1980-02-07      Coprosma parviflora Individual plant counts
+#&gt;   agg_1_value stratumName
+#&gt; 1           1        &lt;NA&gt;
+#&gt; 2           1        &lt;NA&gt;
+#&gt; 3           1        &lt;NA&gt;
+#&gt; 4           1        &lt;NA&gt;
+#&gt; 5           1        &lt;NA&gt;
+#&gt; 6           4        &lt;NA&gt;</div><div class='input'>
 <span class='co'># Example with frequency in transects</span>
 <span class='fu'>data</span>(<span class='no'>takitimu</span>)
 <span class='no'>mapping</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>plotName</span> <span class='kw'>=</span> <span class='st'>"Plot"</span>, <span class='kw'>subPlotName</span> <span class='kw'>=</span> <span class='st'>"Subplot"</span>, <span class='kw'>obsStartDate</span> <span class='kw'>=</span> <span class='st'>"PlotObsStartDate"</span>,
                <span class='kw'>taxonName</span> <span class='kw'>=</span> <span class='st'>"NVSSpeciesName"</span>, <span class='kw'>freq</span> <span class='kw'>=</span> <span class='st'>"Value"</span>)
-<span class='no'>freqscale</span> <span class='kw'>=</span> <span class='fu'><a href='predefinedMeasurementMethod.html'>predefinedMeasurementMethod</a></span>(<span class='st'>"Plant frequency/%"</span>)
 <span class='no'>x</span> <span class='kw'>=</span> <span class='fu'>addAggregateOrganismObservations</span>(<span class='fu'><a href='newVegX.html'>newVegX</a></span>(), <span class='no'>taki_freq</span>, <span class='no'>mapping</span>,
-                                     <span class='kw'>methods</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='kw'>freq</span><span class='kw'>=</span><span class='no'>freqscale</span>))</div><div class='output co'>#&gt;  1 additional aggregate organism measurements found: Value.
+               <span class='kw'>methods</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>freq</span><span class='kw'>=</span><span class='st'>"Plant frequency/%"</span>))</div><div class='output co'>#&gt;  1 additional aggregate organism measurements found: Value.
 #&gt;  Measurement method 'Plant frequency/%' added for 'freq'.
 #&gt;  5 plot(s) parsed, 5 new added.
 #&gt;  5 plot observation(s) parsed, 5 new added.

@@ -15,14 +15,14 @@
 #'    \item{\code{heightMeasurement} - Optional height at which the aggregated observation was made, e.g. in meters. It applies to all aggregate measurements (optional).}
 #'    \item{\code{...} - User defined names used to map aggregate organism measurements, such as percent cover (optional).}
 #'  }
-#' @param methods A list measurement methods for \code{heightMeasurement} and all the user defined aggregate organism measurements (each method is an object of class \code{\linkS4class{VegXMethodDefinition}}).
+#' @param methods A list with measurement methods for \code{heightMeasurement} and all the user defined aggregate organism measurements (each method is an object of class \code{\linkS4class{VegXMethodDefinition}}).
+#' Alternatively, methods can be specified using strings if predefined methods exist (see \code{\link{predefinedMeasurementMethod}}).
 #' @param stratumDefinition An object of class \code{\linkS4class{VegXStrataDefinition}} indicating the definition of strata.
 #' @param date.format A character string specifying the input format of dates (see \code{\link{as.Date}}).
 #' @param missing.values A character vector of values that should be considered as missing observations/measurements.
 #' @param verbose A boolean flag to indicate console output of the data integration process.
 #'
 #' @return The modified object of class \code{\linkS4class{VegX}}.
-#' @export
 #'
 #' @references Wiser SK, Spencer N, De Caceres M, Kleikamp M, Boyle B & Peet RK (2011). Veg-X - an exchange standard for plot-based vegetation data
 #'
@@ -51,27 +51,32 @@
 #' coverscale = defineOrdinalScaleMethod(name = "Recce cover scale",
 #'                    description = "Recce recording method by Hurst/Allen",
 #'                    subject = "plant cover",
-#'                    citation = "Hurst, JM and Allen, RB. (2007) The Recce method for describing New Zealand vegetation – Field protocols. Landcare Research, Lincoln.",
+#'                    citation = "Hurst, JM and Allen, RB. (2007) 
+#'                        The Recce method for describing New Zealand vegetation – 
+#'                        Field protocols. Landcare Research, Lincoln.",
 #'                    codes = c("P","1","2","3", "4", "5", "6"),
 #'                    quantifiableCodes = c("1","2","3", "4", "5", "6"),
 #'                    breaks = c(0, 1, 5, 25, 50, 75, 100),
 #'                    midPoints = c(0.05, 0.5, 15, 37.5, 62.5, 87.5),
-#'                    definitions = c("Presence", "<1%", "1-5%","6-25%", "26-50%", "51-75%", "76-100%"))
+#'                    definitions = c("Presence", "<1%", "1-5%","6-25%", 
+#'                                    "26-50%", "51-75%", "76-100%"))
 #'
 #' # Define strata
 #' strataDef = defineMixedStrata(name = "Recce strata",
-#'                               description = "Standard Recce stratum definition",
-#'                               citation = "Hurst, JM and Allen, RB. (2007) The Recce method for describing New Zealand vegetation – Field protocols. Landcare Research, Lincoln.",
-#'                               heightStrataBreaks = c(0, 0.3,2.0,5, 12, 25, 50),
-#'                               heightStrataNames = paste0("Tier ",1:6),
-#'                               categoryStrataNames = "Tier 7",
-#'                               categoryStrataDefinition = "Epiphytes")
+#'                  description = "Standard Recce stratum definition",
+#'                  citation = "Hurst, JM and Allen, RB. (2007) 
+#'                    The Recce method for describing New Zealand vegetation – Field protocols. 
+#'                    Landcare Research, Lincoln.",
+#'                  heightStrataBreaks = c(0, 0.3,2.0,5, 12, 25, 50),
+#'                  heightStrataNames = paste0("Tier ",1:6),
+#'                  categoryStrataNames = "Tier 7",
+#'                  categoryStrataDefinition = "Epiphytes")
 #'
 #' # Create new Veg-X document with aggregate organism observations
 #' x = addAggregateOrganismObservations(newVegX(), moki_tcv,
-#'                         mapping = mapping,
-#'                         methods = c(cover=coverscale),
-#'                         stratumDefinition = strataDef)
+#'                  mapping = mapping,
+#'                  methods = list(cover=coverscale),
+#'                  stratumDefinition = strataDef)
 #'
 #' # Inspect the result
 #' head(showElementTable(x, "aggregateOrganismObservation"))
@@ -81,24 +86,23 @@
 #' data(mtfyffe)
 #' mapping = list(plotName = "Plot", subPlotName = "Subplot", obsStartDate = "PlotObsStartDate",
 #'                taxonName = "NVSSpeciesName", stratumName = "Tier", counts = "Value")
-#' countscale = predefinedMeasurementMethod("Plant counts")
 #' strataDef = defineHeightStrata(name = "Standard seedling/sapling strata",
-#'                                description = "Seedling/sapling stratum definition",
-#'                                heightBreaks = c(0, 15, 45, 75, 105, 135, 200),
-#'                                strataNames = as.character(1:6),
-#'                                strataDefinitions = c("0-15 cm", "16-45 cm", "46-75 cm", "76-105 cm", "106-135 cm", "> 135 cm"))
+#'                description = "Seedling/sapling stratum definition",
+#'                heightBreaks = c(0, 15, 45, 75, 105, 135, 200),
+#'                strataNames = as.character(1:6),
+#'                strataDefinitions = c("0-15 cm", "16-45 cm", "46-75 cm", 
+#'                                      "76-105 cm", "106-135 cm", "> 135 cm"))
 #' x = addAggregateOrganismObservations(newVegX(), mtfyffe_counts, mapping,
-#'                                      methods = c(counts=countscale),
-#'                                      stratumDefinition = strataDef)
+#'                methods = list(counts="Individual plant counts"),
+#'                stratumDefinition = strataDef)
 #' head(showElementTable(x, "aggregateOrganismObservation"))
 #'
 #' # Example with frequency in transects
 #' data(takitimu)
 #' mapping = list(plotName = "Plot", subPlotName = "Subplot", obsStartDate = "PlotObsStartDate",
 #'                taxonName = "NVSSpeciesName", freq = "Value")
-#' freqscale = predefinedMeasurementMethod("Plant frequency/%")
 #' x = addAggregateOrganismObservations(newVegX(), taki_freq, mapping,
-#'                                      methods = c(freq=freqscale))
+#'                methods = list(freq="Plant frequency/%"))
 #' head(showElementTable(x, "aggregateOrganismObservation"))
 #'
 addAggregateOrganismObservations<-function(target, x,
@@ -178,6 +182,11 @@ addAggregateOrganismObservations<-function(target, x,
   methodAttIDs = list()
   for(m in names(methods)) {
     method = methods[[m]]
+    if(class(method)=="character") {
+      method = predefinedMeasurementMethod(method)
+      methods[[m]] = method
+    }
+    else if (class(method) != "VegXMethodDefinition") stop(paste("Wrong class for method: ",m ,"."))
     nmtid = .newMethodIDByName(target,method@name)
     methodID = nmtid$id
     methodIDs[[m]] = methodID

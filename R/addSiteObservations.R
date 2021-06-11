@@ -6,24 +6,39 @@
 #' @param x A data frame where each row corresponds to one plot observation. Columns can be varied.
 #' @param plotObservationMapping A list with element names 'plotName', 'obsStartDate', used to specify the mapping of data columns (specified using strings for column names) onto these variables.
 #' Additional optional mappings are: 'subPlotName'.
-#' @param soilMeasurementMapping A list with element names equal to soil measurement subjects, used to specify the mapping of data columns (specified using strings for column names) onto these variables.
-#' @param climateMeasurementMapping A list with element names equal to climate measurement subjects, used to specify the mapping of data columns (specified using strings for column names) onto these variables.
-#' @param waterBodyMeasurementMapping A list with element names equal to water body measurement subjects, used to specify the mapping of data columns (specified using strings for column names) onto these variables.
+#' @param soilMeasurementMapping A named list used to specify the mapping of data columns to soil variables (e.g. a = "pH" to map variable "pH" of the data frame). List names should be the same as in \code{soilMeasurementMethods}.
+#' @param climateMeasurementMapping A named list used to specify the mapping of data columns to climate variables. List names should be the same as in \code{climateMeasurementMethods}.
+#' @param waterBodyMeasurementMapping A named list used to specify the mapping of data columns to water body variables. List names should be the same as in \code{waterBodyMeasurementMethods}.
 #' @param soilMeasurementMethods A named list of objects of class \code{\linkS4class{VegXMethodDefinition}} with the measurement method
-#' for each of the soil variables stated in \code{soilMeasurementMapping}. List names should be the same as soil subject measurement variables
-#' (e.g. \code{list(pH = pHmeth)} to specify the use of method '\code{pHmeth}' for pH measurements).
+#' for each of the element names stated in \code{soilMeasurementMapping} (e.g. \code{list(a = pHmeth)} to specify the use of method '\code{pHmeth}' for soil1). 
+#' Alternatively, methods can be specified using strings if predefined methods exist (e.g. \code{list(a = "pH/0-14")} to use the predefined method "pH/0-14"), 
+#' see \code{\link{predefinedMeasurementMethod}}.
 #' @param climateMeasurementMethods A named list of objects of class \code{\linkS4class{VegXMethodDefinition}} with the measurement method
-#' for each of the soil variables stated in \code{soilMeasurementMapping}. List names should be the same as climate subject measurement variables.
+#' for each of the element names stated in \code{climateMeasurementMapping}. List names should be the same as climate subject measurement variables. Alternatively,
+#' methods can be specified using strings if predefined methods exist, 
+#' see \code{\link{predefinedMeasurementMethod}}.
 #' @param waterBodyMeasurementMethods A named list of objects of class \code{\linkS4class{VegXMethodDefinition}} with the measurement method
-#' for each of the soil variables stated in \code{soilMeasurementMapping}. List names should be the same as water body subject measurement variables.
+#' for each of the element names stated in \code{waterBodyMeasurementMapping}. List names should be the same as water body subject measurement variables. Alternatively,
+#' methods can be specified using strings if predefined methods exist, 
+#' see \code{\link{predefinedMeasurementMethod}}.
 #' @param date.format A character string specifying the input format of dates (see \code{\link{as.Date}}).
 #' @param missing.values A character vector of values that should be considered as missing observations/measurements.
+#' @param fill.methods A flag to indicate that missing methods should be filled with dummy ones. This allows easily storing any environmental data, but without appropriate metadata.
 #' @param verbose A boolean flag to indicate console output of the data integration process.
 #'
 #' @return The modified object of class \code{\linkS4class{VegX}}.
-#' @export
 #'
-#' @details Missing value policy:
+#' @details 
+#' Unlike in other functions, here the element names of mappings are only used to find the corresponding method. The measured subject (e.g. pH, salinity or mean annual temperature) is taken from the method definition. 
+#' There is one exception to this rule: users can use \code{fill.methods = TRUE} to skip defining methods for all environmental variables. In this case, the 
+#' function will define dummy measurement methods, taking the element name of the mapping list as subject. For example, if
+#' \code{soilMeasurementMapping = list(pHvar = "pH")} and no method is provided for pHvar in \code{soilMeasurementMethods}, the function will create
+#' a dummy measurement method called 'pHvar'. Although this possibility is given to ease import, users are encouraged to define
+#' site measurement methods or to use predefined ones. When defining measurement methods, users should preferably name subjects using the same strings as in predefined methods,
+#' because this facilitates merging datasets where the same entities have been measured. 
+#' Please contact Veg-X developers to ask for additional predefined measurement methods if you think they are rellevant for exchanging vegetation plot data. 
+#' 
+#' Missing value policy:
 #' \itemize{
 #'   \item{Missing 'plotName' or 'obsStartDate' values are interpreted as if the previous non-missing value has to be used to define plot observation.}
 #'   \item{Missing 'subPlotName' values are interpreted in that observation refers to the parent plotName.}
@@ -40,19 +55,16 @@
 #' # Define mapping
 #' mapping = list(plotName = "Plot", subPlotName = "Subplot",
 #'                obsStartDate = "PlotObsStartDate")
-#' soilmapping = list(pH = "pH")
-#'
-#' # Define pH method
-#' pHMeth = predefinedMeasurementMethod("pH")
 #'
 #' # Create new Veg-X document with site observations
+#' # Uses predefined measurement method "pH/0-14"
 #' x = addSiteObservations(newVegX(), moki_site,
 #'                         plotObservationMapping = mapping,
-#'                         soilMeasurementMapping = soilmapping,
-#'                         soilMeasurementMethods = list(pH = pHMeth))
+#'                         soilMeasurementMapping = list(a = "pH") ,
+#'                         soilMeasurementMethods = list(a = "pH/0-14"))
 #' # Examine results
 #' summary(x)
-#' head(showElementTable(x, "siteObservation"))
+#' head(showElementTable(x, "siteObservation", subject=TRUE))
 #'
 addSiteObservations<-function(target, x,
                               plotObservationMapping,
@@ -64,6 +76,7 @@ addSiteObservations<-function(target, x,
                               waterBodyMeasurementMethods = list(),
                               date.format = "%Y-%m-%d",
                               missing.values = c(NA,""),
+                              fill.methods = FALSE,
                               verbose = TRUE) {
 
   if(class(target)!="VegX") stop("Wrong class for 'target'. Should be an object of class 'VegX'")
@@ -71,14 +84,14 @@ addSiteObservations<-function(target, x,
   nrecords = nrow(x)
   nmissing = 0
 
-
-  # Get recognized site subjects
-  soilVariables = c('pH')
+  
+  
+  #check mappings
+  soilVariables = c()
   climateVariables = c()
   waterBodyVariables = c()
+  
 
-  #check mappings
-  siteVariables = c(soilVariables, climateVariables, waterBodyVariables)
   plotObservationMappingsAvailable = c("plotName", "obsStartDate", "subPlotName")
   siteValues = list()
   for(i in 1:length(plotObservationMapping)) {
@@ -86,25 +99,56 @@ addSiteObservations<-function(target, x,
   }
   if(length(soilMeasurementMapping)>0) {
     for(i in 1:length(soilMeasurementMapping)) {
-      if(!(names(soilMeasurementMapping)[i] %in% soilVariables)) stop(paste0("Mapping for '", names(soilMeasurementMapping)[i], "' cannot be defined."))
-      if(!(names(soilMeasurementMapping)[i] %in% names(soilMeasurementMethods))) stop(paste0("Measurement method should be provided corresponding to mapping '", names(soilMeasurementMapping)[i], "'."))
+      soilVariables = c(soilVariables, names(soilMeasurementMapping)[i])
       siteValues[[names(soilMeasurementMapping)[i]]] = as.character(x[[soilMeasurementMapping[[i]]]])
+      if(!(names(soilMeasurementMapping)[i] %in% names(soilMeasurementMethods))) {
+        if(!fill.methods)  stop(paste0("Measurement method should be provided corresponding to mapping '", names(soilMeasurementMapping)[i], "' (alternatively, set 'fill.methods = TRUE')."))
+        else {
+          varname = names(soilMeasurementMapping)[i]
+          values = x[[soilMeasurementMapping[[i]]]]
+          warning(paste0("Dummy measurement method defined for '", varname, "'."))
+          varclass = class(values)
+          newMethod = defineQuantitativeScaleMethod(varname, description = "unknown", subject=varname, unit="unknown")
+          soilMeasurementMethods[[varname]] = newMethod
+        }
+      }
     }
   }
   if(length(climateMeasurementMapping)>0) {
     for(i in 1:length(climateMeasurementMapping)) {
-      if(!(names(climateMeasurementMapping)[i] %in% climateVariables)) stop(paste0("Mapping for '", names(climateMeasurementMapping)[i], "' cannot be defined."))
-      if(!(names(climateMeasurementMapping)[i] %in% names(climateMeasurementMethods))) stop(paste0("Measurement method should be provided corresponding to mapping '", names(climateMeasurementMapping)[i], "'."))
+      climateVariables = c(climateVariables, names(climateMeasurementMapping)[i])
       siteValues[[names(climateMeasurementMapping)[i]]] = as.character(x[[climateMeasurementMapping[[i]]]])
+      if(!(names(climateMeasurementMapping)[i] %in% names(climateMeasurementMethods))) {
+        if(!fill.methods)  stop(paste0("Measurement method should be provided corresponding to mapping '", names(climateMeasurementMapping)[i], "' (alternatively, set 'fill.methods = TRUE')."))
+        else {
+          varname = names(climateMeasurementMapping)[i]
+          values = x[[climateMeasurementMapping[[i]]]]
+          warning(paste0("Dummy measurement method defined for '", varname, "'."))
+          varclass = class(values)
+          newMethod = defineQuantitativeScaleMethod(varname, description = "unknown", subject=varname, unit="unknown")
+          climateMeasurementMethods[[varname]] = newMethod
+        }
+      }
     }
   }
   if(length(waterBodyMeasurementMapping)>0) {
     for(i in 1:length(waterBodyMeasurementMapping)) {
-      if(!(names(waterBodyMeasurementMapping)[i] %in% waterBodyVariables)) stop(paste0("Mapping for '", names(waterBodyMeasurementMapping)[i], "' cannot be defined."))
-      if(!(names(waterBodyMeasurementMapping)[i] %in% names(waterBodyMeasurementMethods))) stop(paste0("Measurement method should be provided corresponding to mapping '", names(waterBodyMeasurementMapping)[i], "'."))
+      waterBodyVariables = c(waterBodyVariables, names(waterBodyMeasurementMapping)[i])
       siteValues[[names(waterBodyMeasurementMapping)[i]]] = as.character(x[[waterBodyMeasurementMapping[[i]]]])
+      if(!(names(waterBodyMeasurementMapping)[i] %in% names(waterBodyMeasurementMethods))) {
+        if(!fill.methods)  stop(paste0("Measurement method should be provided corresponding to mapping '", names(waterBodyMeasurementMapping)[i], "' (alternatively, set 'fill.methods = TRUE')."))
+        else {
+          varname = names(waterBodyMeasurementMapping)[i]
+          values = x[[waterBodyMeasurementMapping[[i]]]]
+          warning(paste0("Dummy measurement method defined for '", varname, "'."))
+          varclass = class(values)
+          newMethod = defineQuantitativeScaleMethod(varname, description = "unknown", subject=varname, unit="unknown")
+          waterBodyMeasurementMethods[[varname]] = newMethod
+        }
+      }
     }
   }
+  
   #Check columns exist
   for(i in 1:length(plotObservationMapping)) {
     if(!(plotObservationMapping[i] %in% names(x))) stop(paste0("Variable '", plotObservationMapping[i],"' not found in column names. Revise mapping or data."))
@@ -142,19 +186,16 @@ addSiteObservations<-function(target, x,
   #check methods for site variables
   if(length(soilMeasurementMethods)>0) {
     for(i in 1:length(soilMeasurementMethods)) {
-      if(!(names(soilMeasurementMethods)[i] %in% soilVariables)) stop(paste0("Method for '", names(soilMeasurementMethods)[i], "' cannot be applied."))
       if(!(names(soilMeasurementMethods)[i] %in% names(soilMeasurementMapping))) stop(paste0("Mapping should be defined corresponding to measurement method '", names(soilMeasurementMethods)[i], "'."))
     }
   }
   if(length(climateMeasurementMethods)>0) {
     for(i in 1:length(climateMeasurementMethods)) {
-      if(!(names(climateMeasurementMethods)[i] %in% climateVariables)) stop(paste0("Method for '", names(climateMeasurementMethods)[i], "' cannot be applied."))
       if(!(names(climateMeasurementMethods)[i] %in% names(climateMeasurementMapping))) stop(paste0("Mapping should be defined corresponding to measurement method '", names(climateMeasurementMethods)[i], "'."))
     }
   }
   if(length(waterBodyMeasurementMethods)>0) {
     for(i in 1:length(waterBodyMeasurementMethods)) {
-      if(!(names(waterBodyMeasurementMethods)[i] %in% waterBodyVariables)) stop(paste0("Method for '", names(waterBodyMeasurementMethods)[i], "' cannot be applied."))
       if(!(names(waterBodyMeasurementMethods)[i] %in% names(waterBodyMeasurementMapping))) stop(paste0("Mapping should be defined corresponding to measurement method '", names(waterBodyMeasurementMethods)[i], "'."))
     }
   }
@@ -167,6 +208,11 @@ addSiteObservations<-function(target, x,
   measurementMethods = c(soilMeasurementMethods, climateMeasurementMethods, waterBodyMeasurementMethods)
   for(m in names(measurementMethods)) {
     method = measurementMethods[[m]]
+    if(class(method)=="character") {
+      method = predefinedMeasurementMethod(method)
+      measurementMethods[[m]] = method
+    }
+    else if (class(method) != "VegXMethodDefinition") stop(paste("Wrong class for method: ",m ,"."))
     nmtid = .newMethodIDByName(target,method@name)
     methodID = nmtid$id
     methodIDs[[m]] = methodID

@@ -13,7 +13,6 @@
 #' @param max.nchar Maximum number of characters in strings
 #'
 #' @return a data frame
-#' @export
 #'
 #' @examples
 #' data(mokihinui)
@@ -25,15 +24,20 @@
 #' coverscale = defineOrdinalScaleMethod(name = "Recce cover scale",
 #'                    description = "Recce recording method by Hurst/Allen",
 #'                    subject = "plant cover",
-#'                    citation = "Hurst, JM and Allen, RB. (2007) The Recce method for describing New Zealand vegetation – Field protocols. Landcare Research, Lincoln.",
+#'                    citation = "Hurst, JM and Allen, RB. (2007) 
+#'                       The Recce method for describing New Zealand vegetation – Field protocols. 
+#'                       Landcare Research, Lincoln.",
 #'                    codes = c("P","1","2","3", "4", "5", "6"),
 #'                    quantifiableCodes = c("1","2","3", "4", "5", "6"),
 #'                    breaks = c(0, 1, 5, 25, 50, 75, 100),
 #'                    midPoints = c(0.05, 0.5, 15, 37.5, 62.5, 87.5),
-#'                    definitions = c("Presence", "<1%", "1-5%","6-25%", "26-50%", "51-75%", "76-100%"))
+#'                    definitions = c("Presence", "<1%", "1-5%","6-25%", "26-50%", 
+#'                                    "51-75%", "76-100%"))
 #' strataDef = defineMixedStrata(name = "Recce strata",
 #'                    description = "Standard Recce stratum definition",
-#'                    citation = "Hurst, JM and Allen, RB. (2007) The Recce method for describing New Zealand vegetation – Field protocols. Landcare Research, Lincoln.",
+#'                    citation = "Hurst, JM and Allen, RB. (2007) 
+#'                      The Recce method for describing New Zealand vegetation – Field protocols. 
+#'                      Landcare Research, Lincoln.",
 #'                    heightStrataBreaks = c(0, 0.3,2.0,5, 12, 25, 50),
 #'                    heightStrataNames = paste0("Tier ",1:6),
 #'                    categoryStrataNames = "Tier 7",
@@ -721,23 +725,27 @@ showElementTable<-function(x, element = "plot", IDs = FALSE, subjects = FALSE, m
         }
         res[i, "plotName"] = x@plots[[x@plotObservations[[x@siteObservations[[i]]$plotObservationID]]$plotID]]$plotName
         res[i, "obsStartDate"] = as.character(x@plotObservations[[x@siteObservations[[i]]$plotObservationID]]$obsStartDate)
-        for(mesType in c("soilMeasurements", "climateMeasurements", "waterBodyMeasurements")) {
+        mesTypes = c("soilMeasurements", "climateMeasurements", "waterBodyMeasurements")
+        nameTypes = c("soil","climate", "water")
+        for(s in 1:3) {
+          mesType = mesTypes[s]
+          nameType =nameTypes[s]
           if(mesType %in% names(x@siteObservations[[i]])) {
             measurements = x@siteObservations[[i]][[mesType]]
             for(j in 1:length(measurements)) {
               attID = measurements[[j]]$attributeID
-              soilAttID = paste0("soil", names(measurements)[j],"_attributeID")
+              siteAttID = paste0(nameType, names(measurements)[j],"_attributeID")
               if(IDs) {
-                res[i, soilAttID] = measurements[[j]]$attributeID
+                res[i, siteAttID] = measurements[[j]]$attributeID
               }
-              soilMethod = paste0("soil_", names(measurements)[j],"_method")
-              res[i, soilMethod] = x@methods[[x@attributes[[attID]]$methodID]]$name
+              sitemethod = paste0(nameType,"_", names(measurements)[j],"_method")
+              res[i, sitemethod] = x@methods[[x@attributes[[attID]]$methodID]]$name
               if(subjects) {
-                soilSubject = paste0("soil_", names(measurements)[j],"_subject")
-               res[i, soilSubject] = x@methods[[x@attributes[[attID]]$methodID]]$subject
+               subject = paste0(nameType,"_", names(measurements)[j],"_subject")
+               res[i, subject] = x@methods[[x@attributes[[attID]]$methodID]]$subject
               }
-              soilVal = paste0("soil_", names(measurements)[j],"_value")
-              res[i, soilVal] = measurements[[j]]$value
+              val = paste0(nameType,"_", names(measurements)[j],"_value")
+              res[i, val] = measurements[[j]]$value
             }
           }
         }

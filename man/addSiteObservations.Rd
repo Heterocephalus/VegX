@@ -9,7 +9,7 @@ addSiteObservations(target, x, plotObservationMapping,
   waterBodyMeasurementMapping = list(),
   soilMeasurementMethods = list(), climateMeasurementMethods = list(),
   waterBodyMeasurementMethods = list(), date.format = "\%Y-\%m-\%d",
-  missing.values = c(NA, ""), verbose = TRUE)
+  missing.values = c(NA, ""), fill.methods = FALSE, verbose = TRUE)
 }
 \arguments{
 \item{target}{The initial object of class \code{\linkS4class{VegX}} to be modified}
@@ -19,25 +19,32 @@ addSiteObservations(target, x, plotObservationMapping,
 \item{plotObservationMapping}{A list with element names 'plotName', 'obsStartDate', used to specify the mapping of data columns (specified using strings for column names) onto these variables.
 Additional optional mappings are: 'subPlotName'.}
 
-\item{soilMeasurementMapping}{A list with element names equal to soil measurement subjects, used to specify the mapping of data columns (specified using strings for column names) onto these variables.}
+\item{soilMeasurementMapping}{A named list used to specify the mapping of data columns to soil variables (e.g. a = "pH" to map variable "pH" of the data frame). List names should be the same as in \code{soilMeasurementMethods}.}
 
-\item{climateMeasurementMapping}{A list with element names equal to climate measurement subjects, used to specify the mapping of data columns (specified using strings for column names) onto these variables.}
+\item{climateMeasurementMapping}{A named list used to specify the mapping of data columns to climate variables. List names should be the same as in \code{climateMeasurementMethods}.}
 
-\item{waterBodyMeasurementMapping}{A list with element names equal to water body measurement subjects, used to specify the mapping of data columns (specified using strings for column names) onto these variables.}
+\item{waterBodyMeasurementMapping}{A named list used to specify the mapping of data columns to water body variables. List names should be the same as in \code{waterBodyMeasurementMethods}.}
 
 \item{soilMeasurementMethods}{A named list of objects of class \code{\linkS4class{VegXMethodDefinition}} with the measurement method
-for each of the soil variables stated in \code{soilMeasurementMapping}. List names should be the same as soil subject measurement variables
-(e.g. \code{list(pH = pHmeth)} to specify the use of method '\code{pHmeth}' for pH measurements).}
+for each of the element names stated in \code{soilMeasurementMapping} (e.g. \code{list(a = pHmeth)} to specify the use of method '\code{pHmeth}' for soil1). 
+Alternatively, methods can be specified using strings if predefined methods exist (e.g. \code{list(a = "pH/0-14")} to use the predefined method "pH/0-14"), 
+see \code{\link{predefinedMeasurementMethod}}.}
 
 \item{climateMeasurementMethods}{A named list of objects of class \code{\linkS4class{VegXMethodDefinition}} with the measurement method
-for each of the soil variables stated in \code{soilMeasurementMapping}. List names should be the same as climate subject measurement variables.}
+for each of the element names stated in \code{climateMeasurementMapping}. List names should be the same as climate subject measurement variables. Alternatively,
+methods can be specified using strings if predefined methods exist, 
+see \code{\link{predefinedMeasurementMethod}}.}
 
 \item{waterBodyMeasurementMethods}{A named list of objects of class \code{\linkS4class{VegXMethodDefinition}} with the measurement method
-for each of the soil variables stated in \code{soilMeasurementMapping}. List names should be the same as water body subject measurement variables.}
+for each of the element names stated in \code{waterBodyMeasurementMapping}. List names should be the same as water body subject measurement variables. Alternatively,
+methods can be specified using strings if predefined methods exist, 
+see \code{\link{predefinedMeasurementMethod}}.}
 
 \item{date.format}{A character string specifying the input format of dates (see \code{\link{as.Date}}).}
 
 \item{missing.values}{A character vector of values that should be considered as missing observations/measurements.}
+
+\item{fill.methods}{A flag to indicate that missing methods should be filled with dummy ones. This allows easily storing any environmental data, but without appropriate metadata.}
 
 \item{verbose}{A boolean flag to indicate console output of the data integration process.}
 }
@@ -48,6 +55,15 @@ The modified object of class \code{\linkS4class{VegX}}.
 Adds site observation records to a VegX object from a data table where rows are plot observations.
 }
 \details{
+Unlike in other functions, here the element names of mappings are only used to find the corresponding method. The measured subject (e.g. pH, salinity or mean annual temperature) is taken from the method definition. 
+There is one exception to this rule: users can use \code{fill.methods = TRUE} to skip defining methods for all environmental variables. In this case, the 
+function will define dummy measurement methods, taking the element name of the mapping list as subject. For example, if
+\code{soilMeasurementMapping = list(pHvar = "pH")} and no method is provided for pHvar in \code{soilMeasurementMethods}, the function will create
+a dummy measurement method called 'pHvar'. Although this possibility is given to ease import, users are encouraged to define
+site measurement methods or to use predefined ones. When defining measurement methods, users should preferably name subjects using the same strings as in predefined methods,
+because this facilitates merging datasets where the same entities have been measured. 
+Please contact Veg-X developers to ask for additional predefined measurement methods if you think they are rellevant for exchanging vegetation plot data. 
+
 Missing value policy:
 \itemize{
   \item{Missing 'plotName' or 'obsStartDate' values are interpreted as if the previous non-missing value has to be used to define plot observation.}
@@ -62,19 +78,16 @@ data(mokihinui)
 # Define mapping
 mapping = list(plotName = "Plot", subPlotName = "Subplot",
                obsStartDate = "PlotObsStartDate")
-soilmapping = list(pH = "pH")
-
-# Define pH method
-pHMeth = predefinedMeasurementMethod("pH")
 
 # Create new Veg-X document with site observations
+# Uses predefined measurement method "pH/0-14"
 x = addSiteObservations(newVegX(), moki_site,
                         plotObservationMapping = mapping,
-                        soilMeasurementMapping = soilmapping,
-                        soilMeasurementMethods = list(pH = pHMeth))
+                        soilMeasurementMapping = list(a = "pH") ,
+                        soilMeasurementMethods = list(a = "pH/0-14"))
 # Examine results
 summary(x)
-head(showElementTable(x, "siteObservation"))
+head(showElementTable(x, "siteObservation", subject=TRUE))
 
 }
 \references{
