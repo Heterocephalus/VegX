@@ -12,7 +12,6 @@
 #' @param upperLimit The upper limit of the quantitative scale, if defined.
 #'
 #' @return an object of class \code{\linkS4class{VegXMethodDefinition}}
-#' @export
 #'
 #' @family define measurement functions
 #'
@@ -28,6 +27,8 @@ defineQuantitativeScaleMethod<-function(name, description, subject, unit,
                                         citationString = "", DOI = "",
                                         lowerLimit = -Inf,
                                         upperLimit = Inf) {
+  if(is.na(lowerLimit)) lowerLimit = -Inf
+  if(is.na(upperLimit)) upperLimit = Inf
   attributes = list(
     list(type="quantitative",
          unit = unit,

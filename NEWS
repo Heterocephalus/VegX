@@ -4,6 +4,17 @@
 
 __Version history__
 
+_Version 0.6.10, June 2021.
+1. Update of schema veg-misc.xsd: simpleUserDefinedType has now a choice between attribute or methodID (suggested by Sebastian Schmidtlein).
+
+_Version 0.6.9, November 2018.
+1. Update documentation of 'addSiteObservations'
+
+_Version 0.6.8, July 2018.
+1. Specify predefined methods using strings only
+2. Table with predefined methods
+3. Update 'addSiteObservations'
+
 _Version 0.6.7, July 2018.
 1. Bug correction in 'addPlotGeometries' (reported by F. Jansen)
 2. Redefinition of schema elements for individual organisms (mainly location)

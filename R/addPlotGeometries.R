@@ -16,11 +16,11 @@
 #'    \item{\code{bandWidth} - Sampling bandwidth, for linear plots (optional).}
 #' }
 #' @param methods A list measurement methods for plot geometry measurements (each being an object of class \code{\linkS4class{VegXMethodDefinition}}).
+#' Alternatively, methods can be specified using strings if predefined methods exist (see \code{\link{predefinedMeasurementMethod}}).
 #' @param missing.values A character vector of values that should be considered as missing data.
 #' @param verbose A boolean flag to indicate console output of the data integration process.
 #'
 #' @return The modified object of class \code{\linkS4class{VegX}}.
-#' @export
 #'
 #' @details Named elements in \code{mapping} beyond those used by this function will be ignored. Missing value policy:
 #'  \itemize{
@@ -43,12 +43,11 @@
 #'                width = "PlotRectangleLength01", length = "PlotRectangleLength02")
 #'
 #' # Define methods
-#' areaMethod = predefinedMeasurementMethod("Plot area/m2")
-#' dimensionMethod = predefinedMeasurementMethod("Plot dimension/m")
-#'
+#' methods = list(area = "Plot area/m2", 
+#'                width = "Plot dimension/m", length = "Plot dimension/m") 
+#' 
 #' # Create new Veg-X document with plot locations
-#' x = addPlotGeometries(newVegX(), moki_site, mapping,
-#'                       list(area = areaMethod, width = dimensionMethod, length = dimensionMethod))
+#' x = addPlotGeometries(newVegX(), moki_site, mapping, methods)
 #'
 #' # Inspect results
 #' showElementTable(x, "plot")
@@ -110,6 +109,11 @@ addPlotGeometries<-function(target, x,
   methodAttIDs = list()
   for(m in names(methods)) {
     method = methods[[m]]
+    if(class(method)=="character") {
+      method = predefinedMeasurementMethod(method)
+      methods[[m]] = method
+    }
+    else if (class(method) != "VegXMethodDefinition") stop(paste("Wrong class for method: ",m ,"."))
     nmtid = .newMethodIDByName(target,method@name)
     methodID = nmtid$id
     methodIDs[[m]] = methodID

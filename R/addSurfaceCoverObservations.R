@@ -13,13 +13,13 @@
 #'    \item{\code{coverMeasurement} - Surface cover values (required).}
 #'  }
 #' @param coverMethod A method definition for surface cover measurements (an object of class \code{\linkS4class{VegXMethodDefinition}}).
+#' Alternatively, the method can be specified using a string if a predefined method exists (see \code{\link{predefinedMeasurementMethod}}).
 #' @param surfaceTypeDefinition An object of class \code{\linkS4class{VegXSurfaceTypeDefinition}} indicating the definition of surface types.
 #' @param date.format A character string specifying the input format of dates (see \code{\link{as.Date}}).
 #' @param missing.values A character vector of values that should be considered as missing observations/measurements.
 #' @param verbose A boolean flag to indicate console output of the data integration process.
 #'
 #' @return The modified object of class \code{\linkS4class{VegX}}.
-#' @export
 #'
 #' @details Named elements in \code{mapping} other than those used by this function will be ignored. Missing value policy:
 #'  \itemize{
@@ -49,8 +49,8 @@
 #' # Define surface types from the data
 #' unique(mtfyffe_groundcover$PlotGroundCover)
 #' surfaceTypes = defineSurfaceTypes(name = "Default surface types",
-#'                                   description = "Five surface categories",
-#'                                   surfaceNames = c("Vegetation", "Moss", "Litter", "Exposed Soil", "Rock"))
+#'                   description = "Five surface categories",
+#'                   surfaceNames = c("Vegetation", "Moss", "Litter", "Exposed Soil", "Rock"))
 #'
 #' # Create new Veg-X document with surface cover observations
 #' x = addSurfaceCoverObservations(newVegX(), mtfyffe_groundcover, mapping,
@@ -66,8 +66,8 @@
 #'
 #' unique(taki_groundcover$PlotGroundCover)
 #' surfaceTypes = defineSurfaceTypes(name = "Default surface types",
-#'                               description = "Five surface categories",
-#'                               surfaceNames = c("Vegetation", "Soil", "Erosion Pavement", "Litter","Rock"))
+#'                   description = "Five surface categories",
+#'                   surfaceNames = c("Vegetation", "Soil", "Erosion Pavement", "Litter","Rock"))
 #'
 #' x = addSurfaceCoverObservations(newVegX(), taki_groundcover, mapping,
 #'                                 coverMethod, surfaceTypes)
@@ -128,6 +128,11 @@ addSurfaceCoverObservations<-function(target, x, mapping,
   methodAttIDs = list()
   for(m in names(methods)) {
     method = methods[[m]]
+    if(class(method)=="character") {
+      method = predefinedMeasurementMethod(method)
+      methods[[m]] = method
+    }
+    else if (class(method) != "VegXMethodDefinition") stop(paste("Wrong class for method: ",m ,"."))
     nmtid = .newMethodIDByName(target,method@name)
     methodID = nmtid$id
     methodIDs[[m]] = methodID
